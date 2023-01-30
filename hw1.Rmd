@@ -1,0 +1,104 @@
+---
+title: "Data605_HW1"
+author: "Mahmud Hasan Al Raji"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Building the first letters for both first and last name using point plots:
+
+First letters for the first name is "M" and the last name is "A"
+The following code will build MA:
+
+```{r }
+x <- c(rep(-1,500),
+       seq(-0.25,-1,length.out=500), 
+       seq(-0.25,0.5,length.out=500), 
+       rep(0.5,500),
+       seq(1.25,2,length.out=500),
+       seq(1.6,2.4,length.out=500),
+       seq(2.75,2,length.out=500))
+       
+y <- c(seq(-2,1,length.out=500), 
+       seq(-2,1,length.out=500), 
+       seq(-2,1,length.out=500), 
+       seq(-2,1,length.out=500),
+       seq(-2,1,length.out=500),
+       rep(-0.7,500),
+       seq(-2,1,length.out=500))
+       
+z=rbind(x,y)
+plot(y~x, xlim=c(-3,3), ylim=c(-3,3))
+
+```
+
+# Writing R code that will left multiply (%>%) a square matrix (x) against each of the vectors of points (y). Initially, that square matrix will be the Identity matrix. Using a loop that changes the transformation matrix incrementally to demonstrate 1) shear, 2) scaling, 3) rotation , and 4) projection in animated fashion.
+
+```{r}
+sq_mtx_mlt  <- function(x,y){
+   x %*% y
+}
+```
+
+# 1-Shearing
+Shearing by taking the identity matrix and replacing one of the zero elements with a non-zero value:
+
+```{r animation.hook="gifski"}
+
+for (i in seq(0,1,length.out=20)) {
+  z1<-apply(z,2,function(x) sq_mtx_mlt(x,matrix(c(1,i,0,1),nrow=2,ncol=2)))
+   plot(z1[2,]~z1[1,], xlim=c(-3,3), ylim=c(-3,3))
+}
+```
+
+
+# 2-Scaling
+Scaling by multiplication of the values:
+
+```{r animation.hook="gifski"}
+for (i in seq(1,3,length.out=20)) {
+  z1<-apply(z,2,function(x) sq_mtx_mlt(x,matrix(c(i,0,0,i),nrow=2,ncol=2)))
+   plot(z1[2,]~z1[1,], xlim=c(-3,3), ylim=c(-3,3))
+}
+
+```
+
+
+# 3-Rotation
+Rotating counterclockwise through an angle 360 degrees with respect to the positive x axis about the origin of the two-dimensional system:
+
+```{r animation.hook="gifski" }
+for (i in seq(0,pi*2,length.out=20)) {
+  z1<-apply(z,2,function(x) sq_mtx_mlt(x,matrix(c(cos(i),-sin(i),sin(i),cos(i)),nrow=2,ncol=2)))
+   plot(z1[2,]~z1[1,], xlim=c(-3,3), ylim=c(-3,3))
+}
+```
+
+
+# 4-Projection
+Projection by rotating around the z-axis:
+
+```{r animation.hook="gifski"}
+
+for (i in seq(0,2*pi,length.out=20)) {
+  zp<-rbind(z,rep(0,ncol(z)))
+  z1<-apply(zp,2,function(x) sq_mtx_mlt(x,matrix(c(1,0,0,0,cos(i),-sin(i),0,sin(i),cos(i)),nrow=3,ncol=3)))
+   plot(z1[2,]~z1[1,], xlim=c(-3,3), ylim=c(-3,3))
+}
+
+```
+
+
+Reference: 
+1.https://www.mathsisfun.com/algebra/matrix-transform.html
+2.https://www.geeksforgeeks.org/computer-graphics-3d-rotation-transformations/amp/
+3.https://bookdown.org/yihui/rmarkdown-cookbook/animation.html
+
+
+
+
+
